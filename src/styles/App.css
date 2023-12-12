@@ -1,0 +1,47 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+
+}
+#root {
+    display: flex;
+    justify-content: center;
+
+
+}
+.App {
+
+    width: 1000px;
+
+
+}
+
+.post {
+    display: flex;
+    padding: 15px;
+    border: 5px solid forestgreen;
+    margin-top: 30px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-btn {
+    margin-right: 0.5rem;
+}
+
+.task-enter {
+    opacity: 0;
+}
+.task-enter-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+}
+.task-exit {
+    opacity: 1;
+}
+.task-exit-active {
+    opacity: 0;
+    transition: opacity 500ms ease-in;
+}
