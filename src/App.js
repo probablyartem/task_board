@@ -1,4 +1,4 @@
-import React, {useState, useRef, useMemo} from 'react';
+import React, {useState, useRef, useMemo, useEffect} from 'react';
 import Counter from "./components/Counter";
 import ClassCounter from "./components/ClassCounter";
 import "./styles/App.css"
@@ -11,6 +11,9 @@ import postItem from "./components/PostItem";
 import MySelect from "./components/UI/select/MySelect";
 import TaskFilter from "./components/TaskFilter";
 import MyModal from "./components/UI/MyModal/MyModal";
+import {useTasks} from "./hooks/useTasks";
+import axios from "axios";
+import TaskServices from "./API/TaskServices";
 function App(factory, deps) {
 
     const  [tasks, setTasks] = useState([
@@ -20,21 +23,22 @@ function App(factory, deps) {
     ])
 
     const [filter, setFilter] = useState({sort: '', query: ''})
-    const [modal, setModal] = useState(false)
-    const sortedTasks = useMemo(() => {
-        console.log('Kekekek')
-        if(filter.sort) {
-            return [...tasks].sort((a,b) => a[filter.sort].localeCompare(b[<filter className="sort"></filter>]))
-        }
-        return tasks;
-    }, [filter.sort, tasks])
+    const [modal, setModal] = useState(false);
+    const sortedandsearchedTasks = useTasks(tasks, filter.sort, filter.query);
+    const [isTasksLoading, setIsTasksLoading] = useState( false);
 
-    const sortedandsearchedTasks = useMemo(() =>{
-        return sortedTasks.filter(task => task.title.toLowerCase().includes(filter.query.toLowerCase()))
-    }, [filter.query, sortedTasks])
+    useEffect(() => {
+        fetchTasks()
+    }, []);
     const createTask = (newTask) => {
-            setTasks( [...tasks, newTask])
-            setModal(false)
+        setTasks( [...tasks, newTask])
+        setModal(false)
+    }
+    async function fetchTasks() {
+        setIsTasksLoading(true);
+        const tasks = await axios.get("https://jsonplaceholder.typicode.com/posts");
+        setTasks(tasks.data)
+        setIsTasksLoading(false);
     }
 
 
@@ -45,6 +49,7 @@ function App(factory, deps) {
 
   return (
       <div  className={"App"}>
+
           <MyButton style={{marginTop: 10}} onClick={() => setModal(true)}>
             Add task
           </MyButton>
@@ -54,7 +59,12 @@ function App(factory, deps) {
           </MyModal>
           <hr style={{margin: "15px 0"}}/>
           <TaskFilter filter={filter} setFilter={setFilter}/>
-          <TaskList remove={removeTask} tasks={sortedandsearchedTasks} title="Spisok moih zadach :"/>
+          {isTasksLoading
+            ? <h1>Идет загрузка...</h1>
+            : <TaskList remove={removeTask} tasks={sortedandsearchedTasks} title="Spisok moih zadach :"/>
+
+          }
+
 
       </div>
   );
