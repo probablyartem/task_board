@@ -14,60 +14,28 @@ import MyModal from "./components/UI/MyModal/MyModal";
 import {useTasks} from "./hooks/useTasks";
 import axios from "axios";
 import TaskServices from "./API/TaskServices";
+import {useFetching} from "./hooks/useFetching";
+import {getPagesArray} from "./utils/pages";
+import Pagination from "./components/UI/pagination/Pagination";
+import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
+import About from "./pages/About";
+import Tasks from "./pages/Tasks";
+import Navbar from "./components/UI/Navbar/Navbar";
+import Error from "./pages/Error";
 function App(factory, deps) {
+    return (
+        <BrowserRouter>
+            <Navbar />
+            <Routes>
+                <Route path="tasks" element={<Tasks />}/>
 
-    const  [tasks, setTasks] = useState([
-        {id: 1, title: 'task1', body: 'Description'},
-        {id: 2, title: 'task2', body: 'Description'},
-        {id: 3, title: 'task3', body: 'Description'}
-    ])
+                <Route path="about" element={<About/>}/>
 
-    const [filter, setFilter] = useState({sort: '', query: ''})
-    const [modal, setModal] = useState(false);
-    const sortedandsearchedTasks = useTasks(tasks, filter.sort, filter.query);
-    const [isTasksLoading, setIsTasksLoading] = useState( false);
+                <Route path="*" element={<Error/>}/>
+            </Routes>
+        </BrowserRouter>
+    )
 
-    useEffect(() => {
-        fetchTasks()
-    }, []);
-    const createTask = (newTask) => {
-        setTasks( [...tasks, newTask])
-        setModal(false)
-    }
-    async function fetchTasks() {
-        setIsTasksLoading(true);
-        const tasks = await axios.get("https://jsonplaceholder.typicode.com/posts");
-        setTasks(tasks.data)
-        setIsTasksLoading(false);
-    }
-
-
-    const removeTask = (task) => {
-            setTasks(tasks.filter(p => p.id !== task.id))
-
-    }
-
-  return (
-      <div  className={"App"}>
-
-          <MyButton style={{marginTop: 10}} onClick={() => setModal(true)}>
-            Add task
-          </MyButton>
-          <MyModal visible={modal} setVisible={setModal}>
-              <TaskForm create={createTask}/>
-
-          </MyModal>
-          <hr style={{margin: "15px 0"}}/>
-          <TaskFilter filter={filter} setFilter={setFilter}/>
-          {isTasksLoading
-            ? <h1>Идет загрузка...</h1>
-            : <TaskList remove={removeTask} tasks={sortedandsearchedTasks} title="Spisok moih zadach :"/>
-
-          }
-
-
-      </div>
-  );
 }
 
 export default App;
